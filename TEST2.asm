@@ -1,0 +1,43 @@
+DATA SEGMENT
+	ARRAY DB 3 DUP(?)
+DATA ENDS
+CODE SEGMENT
+ASSUME CS:CODE,DS:DATA
+START: MOV AX,DATA
+	   MOV DS,AX
+	   MOV ES,AX
+	   LEA SI,ARRAY
+	   MOV CL,3
+	   
+L1:	   MOV AH,01H
+	   INT 21H
+	   MOV ES:[SI],AL
+	   INC SI
+	   LOOP L1
+	   
+	   MOV BH,0
+	   LEA SI,ARRAY
+	   MOV AL,ES:[SI]
+	   MOV AH,ES:[SI+1]
+	   MOV BL,ES:[SI+2]
+	   CMP AL,AH
+	   JNZ L2
+	   INC BH
+	   
+L2:	   CMP AL,BL
+	   JNZ L3
+	   INC BH
+	   
+L3:	   CMP AH,BL
+	   JNZ FINISH
+	   INC BH
+	   
+FINISH:CMP BH,3
+	   JNZ OUTPUT
+	   DEC BH
+OUTPUT:	MOV DL,BH
+	    ADD DL,'0'				;要加上字符变成ASCII码输出的才是字符0，1，2
+		MOV AH,02H
+		INT 21H
+CODE ENDS
+END START
